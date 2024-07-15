@@ -1,0 +1,149 @@
+**The Project – CS59n**
+
+Spencer Reith, Mathew Sebastion
+7.15.24
+Write-up for Project 00
+
+
+
+Summary of the Problem
+=================
+
+
+Create a DSL using ANTLR4 grammar tools to solve an interesting problem. The language should be relatively simple for a domain expert to learn.
+
+
+Domain
+================
+
+Commodities trading.
+
+Defining the Problem & Purpose of the Language
+================
+
+Defining the Problem
+--------------------------------
+There is no programming language with built in tools to analyze commodities prices and predict prices for futures. Languages like Python and R have lots of data analysis tools, but no built-in way to compare a commodity with several factors that could impact its price.\newline
+
+Purpose of the Language
+--------------------------------
+Our language will mainly be used to answer the following questions:
+- What is a fair futures price for a given commodity?
+- How do environmental factors impact futures prices for a given commodity?
+- Which market futures prices are the furthest off from the user's estimates, and have the highest earning potential.
+
+Example Solutions
+================
+The following example inputs demonstrate how we would answer the questions above.
+
+~~~~
+## EXAMPLE 1 ##
+## A user seeks to adjust a variety of files to account for inflation ##
+## These files detail commodity prices ##
+
+
+COMMODITY corn = {inputs/corn.csv}
+COMMODITY wheat = {inputs/wheat.csv}
+COMMODITY oil = {inputs/oil.csv}
+COMMODITY gold = {inputs/gold.csv}
+
+INFL inflation = {inputs/inflation.csv}
+
+commoditiesList = newArray()
+commoditiesList.add(corn, wheat, oil, gold)
+
+for c in commoditiesList:
+    newFile = c.normalize(inflation)
+    newFile.save(outputs/{c + 'Normalized'})
+
+~~~~
+
+~~~~
+OUTPUT FOR EXAMPLE 1:
+
+our code would produce 4 output files.
+They would be saved to the following locations:
+    outputs/cornNormalized
+    outputs/wheatNormalized
+    outputs/oilNormalized
+    outputs/goldNormalized
+~~~~
+
+
+Testing
+======================
+
+I used different test cases on all my programs, making them for each specific implementation. I modified it as I went to monitor special cases, and tested a bunch of different possibilities, and did more then 10 for each positive and negative example.
+
+<!-- Note: wrapping table in div.noheader will hide the table's header -->
+<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
+<div class="noheader firstcol">
+                      |     
+----------------------|-----
+C                     | Spencer Reith (~12hrs)
+ANTLR4 (Java)         | Spencer Reith (~4hrs)
+Perl                  | Spencer Reith (~4hrs)
+
+</div>
+
+
+<!--
+How do the languages compare to one another?
+Which language was your favorite?  Which was your least favorite?
+What type of problems would each language be good at solving?
+When you had a choice of language, why did you decide on the language in which you implemented your solution?
+If you worked with a partnor, how did you decide to split up the work?
+
+List any other comments below.
+Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
+-->
+
+
+
+
+
+<!--   Feel free to modify the following to fit a theme of your choosing   -->
+<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> <!-- a sans-serif font -->
+<style>  /* A TAYLOR-INSPIRED THEME */
+    body {font-family:'Open Sans',sans-serif;}
+    .md a:link, .md a:visited {color:hsl(252,23.0%,44.3%); font-family:'Open Sans',sans-serif;}
+    .md table.table th {background-color:hsl(252,23.0%,44.3%);}
+    .md .noheader th {display:none;}
+    .md .firstcol td:first-child {white-space:pre;color:white;vertical-align:top;font-weight:bold;border-color:black;background:hsl(252,23.0%,54.3%);}
+    .md .firstcol tr:nth-child(even) td:first-child {background:hsl(252,23.0%,44.3%);}
+</style>
+
+
+<!-- ****************************** -->
+<!--    Leave the content below     -->
+<!-- ****************************** -->
+
+<!-- The script and style below are added for clarity and to workaround a bug -->
+<script>
+    // this is a hack to workaround a bug in Markdeep+Mathjax, where
+    // `$`` is automatically converted to `\(`` and `\)`` too soon.
+    // the following code will replace the innerHTML of all elements
+    // with class "dollar" with a dollar sign.
+    setTimeout(function() {
+        var dollars = document.getElementsByClassName('dollar');
+        for(var i = 0; i < dollars.length; i++) {
+            dollars[i].innerHTML = '&#' + '36;'; // split to prevent conversion to $
+        }
+    }, 1000);
+</script>
+<style>
+    /* adding some styling to <code> tags (but not <pre><code> coding blocks!) */
+    :not(pre) > code {
+        background-color: rgba(0,0,0,0.05);
+        outline: 1px solid rgba(0,0,0,0.15);
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+    }
+    /* fixes table of contents of medium-length document from looking weird if admonitions are behind */
+    .md div.mediumTOC { background: white; }
+    .md div.admonition { position: initial !important; }
+</style>
+
+<!--   Leave the following Markdeep formatting code, as this will format your text above to look nice in a wed browser   -->
+
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
