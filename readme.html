@@ -35,6 +35,8 @@ Our language will mainly be used to answer the following questions:
 Example Solutions
 ================
 The following example inputs demonstrate how we would answer the questions above.
+NOTE, as discussed in class, it does not make sense for us to go through the process of completing all these calculations
+So, we've made a couple of files with arbitrary numbers to get our point across in the meantime
 
 ~~~~
 ## EXAMPLE 1 ##
@@ -62,6 +64,8 @@ for c in commoditiesList:
 OUTPUT FOR EXAMPLE 1:
 
 our code would produce 4 output files.
+they will still be in the format of year:price
+except, the price will be adjusted for inflation
 They would be saved to the following locations:
     outputs/cornNormalized
     outputs/wheatNormalized
@@ -69,34 +73,78 @@ They would be saved to the following locations:
     outputs/goldNormalized
 ~~~~
 
-
-Testing
-======================
-
-I used different test cases on all my programs, making them for each specific implementation. I modified it as I went to monitor special cases, and tested a bunch of different possibilities, and did more then 10 for each positive and negative example.
-
-<!-- Note: wrapping table in div.noheader will hide the table's header -->
-<!-- Note: wrapping table in div.firstcol will style the first column different from other columns -->
-<div class="noheader firstcol">
-                      |     
-----------------------|-----
-C                     | Spencer Reith (~12hrs)
-ANTLR4 (Java)         | Spencer Reith (~4hrs)
-Perl                  | Spencer Reith (~4hrs)
-
-</div>
+~~~~
+## EXAMPLE 2 ##
+## A user seeks to predict the futures price for corn based on rainfall rates, for each of the next 10 years ##
+## In this case, the FACTOR file 'rain' details rainfall rates in the region of interest ##
+## The for loop iterates through years in a 10 year range
 
 
-<!--
-How do the languages compare to one another?
-Which language was your favorite?  Which was your least favorite?
-What type of problems would each language be good at solving?
-When you had a choice of language, why did you decide on the language in which you implemented your solution?
-If you worked with a partnor, how did you decide to split up the work?
+COMMODITY corn = {inputs/corn.csv}
 
-List any other comments below.
-Feel free to provide any feedback on how much you learned from doing the assignment, and whether you enjoyed doing it.
--->
+FACTOR rainfall = {inputs/rainfall.csv}
+
+
+for year in range[1, 10]:
+    prediction = corn.futures(previousYears = 30, futureYears = year, factor = rainfall)
+    print("Year: ", year)
+    print("Prediction: ", prediction)
+
+~~~~
+
+~~~~
+OUTPUT FOR EXAMPLE 1:
+
+our code will print out 9 values in the terminal (since the for loop has square brackets, it will be INCLUSIVE of 1 and 10).
+it will print "Year: {year}", and the next line will print "Prediction: {prediciton}".
+
+see below
+
+-> Year: 1
+-> Prediction: 14.6
+-> Year: 2
+-> Prediction: 14.6
+-> Year: 3
+-> Prediction: 14.7
+-> Year: 4
+-> Prediction: 15.8
+-> Year: 5
+-> Prediction: 13.6
+-> Year: 6
+-> Prediction: 14.7
+-> Year: 7
+-> Prediction: 14.6
+-> Year: 8
+-> Prediction: 14.3
+-> Year: 9
+-> Prediction: 14.3
+-> Year: 10
+-> Prediction: 14.4
+~~~~
+
+Define Functionality
+================
+
+We've laid out the logic / pseudo-code for our language's most important functions below:
+~~~~
+calculating futures ->
+    brief explanation of algorithm/ or just process goes here
+
+normalize to account for inflation ->
+    create a new CSV file (or CSV-like datastructure)
+    for each year in the old file
+        calculate that year's price in today's dollars
+        insert it into the new CSV file
+    return CSV file
+
+saving datastructure to file path ->
+    likely, we'll hold the CSV file as a dictionary or similar object, keyed by {year:value}
+    we'll need to write into a file, at the given file path
+    for each key in the dictionary
+        col1 = year, col2 = value
+
+~~~~
+
 
 
 
