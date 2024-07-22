@@ -1,7 +1,8 @@
 grammar Expr;
 
-prog        :
-            ;
+prog       : stat (NEWLINE stat)* EOF ;
+
+stat       : loadFile | makeList | addToList | removeFromList | normalize | futures | historicalComp;
 
 loadFile    : fileType STRING '=' filePath FILE ',' INT ',' INT
             ;
@@ -12,7 +13,7 @@ fileType    : COMMODITY
             ;
 
 filePath    : STRING '/' filePath
-            | STRING '/' STRING
+            | STRING '/'
             ;
 
 makeList    : LIST type STRING
@@ -26,7 +27,7 @@ moreStrings : ',' STRING moreStrings
             |
             ;
 
-type        : COMMODITITY
+type        : COMMODITY
             | INFLATION
             | FACTOR
             | PREDICTION
@@ -41,51 +42,51 @@ removeFromList  : STRING '.' REMOVE '(' STRING ')'
 normalize   : STRING '.normalize(' STRING ')'
             ;
 
-futures     : STRING '.' futuresFunction '(' futuresParams ') 
+futures     : STRING '.' futuresFunction '(' DATE '-' DATE ',' DATE ',' futuresParams ')'
             ;
+
+futuresFunction : REGRESSION
+                ;
 
 futuresParams   : futuresIterated
                 | futuresWeighted
                 ;
 
-futuresIterated : STRING moreStrings        ## gold.regression(rainfall, turb, asda)
+futuresIterated : STRING moreStrings
 
                 ;
 
-futuresWeighted : STRING '=' STRING         ## two lists, example: gold.regression(myFactors=weights)
-                | STRING '=' INT            ## list w/ equal weights, example gold.regression(myFactors=121999)
+futuresWeighted : STRING '=' STRING
+                | STRING '=' INT
                 | STRING '=' INT moreWeights
                 ;
 
-moreWeights     : ',' STRING '=' INT moreWeights ## example: gold.regression(rainfall=1, gdp=1, turb=1)
+moreWeights     : ',' STRING '=' INT moreWeights
                 |
                 ;
 
-/////
-ADD IN CHECK FUNCTION:
-    calling futures, and comparing to actual historical value
-
-ADDITIONAL TO FUTURES:
-    (1) what historical range are we pulling from
-    (2) how far in the future you want a prediction
-
-ALSO TO DO
-    (1) TEST
-    (2) TEST CASES
-    (3) UPDATE README
+historicalComp : 'historicalComp' '(' STRING ')'
+               | 'historicalComp' '(' DATE ',' STRING ',' (FLOAT | INT)')'
+               ;
 
 
-
-
-INT      : [0-9]+ ;
-FLOAT    : [0-9] +  ( '.' [0-9]+)? ;
-STRING   : [a-zA-Z0-9]+ ;
 FILE     : [a-z]+ '.csv' ;
-LIST     : 'LIST' ;
 ADD      : 'ADD' ;
 REMOVE   : 'REMOVE' ;
+DATE     : INT '/' INT '/' INT ;
+
+LIST     : 'LIST' ;
 
 COMMODITY   : 'COMMODITY' ;
 INFLATION   : 'INFLATION' ;
 FACTOR      : 'FACTOR' ;
 PREDICTION  : 'PREDICTION' ;
+REGRESSION : 'REGRESSION' ;
+
+STRING   : [a-zA-Z] [a-zA-Z0-9]* ;
+INT      : [0-9]+ ;
+FLOAT    : [0-9] +  ( '.' [0-9]+)? ;
+NUM      : FLOAT | INT;
+
+NEWLINE : '\r'? '\n' ;
+WS      : [ \t]+ -> skip ;

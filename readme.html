@@ -1,8 +1,10 @@
 **The Project – CS59**
 
 Spencer Reith, Mathew Sebastion
-7.15.24
-Write-up for Project 00
+7.22.24
+Write-up for the Project
+
+Scroll towards the bottom for updates on P01.
 
 
 
@@ -231,8 +233,222 @@ Check accuracy of calculation
 
 ~~~~
 
+P01 - Updates
+=================
+
+Assignment
+--------------------------------
+1. Create a grammar for the DSL.
+
+2. Test example solutions against grammar. Do you have to make corrections or changes?
+
+Approach
+--------------------------------
+We first defined all the major functions we wanted our language to have. This included the following:
+
+- Loading CSV files
+- Normalizing data to account for inflation
+- Predicting commodity futures based on historical prices
+- Predicting commodity futures based on environmental factors
+- Having data types innate to the language, to store 'COMMODITY' or 'FACTOR' information
+- Run a function against multiple parameters, similar to a common 'for loop', but with a much more intuitive and domain focused syntax
+
+We structured certain aspects of the language to be primed for expansion.
+For example, we will offer multiple types of '.futures()' calculations a user can run. Right now, we've only included support for the '.regression()' algorithm. However, as we advance, we hope to add in more options.
+
+Changes to Initial Plan
+--------------------------------
+We've mostly kept the the original plan, described above in this document.
 
 
+Our only major change has been differentiating between two versions of a futures calculation that can be run.
+
+
+The first is called 'futuresIterated'. In this case, the user wishes to run a prediction for a commodity price based on a variety of different factors one at a time.
+For example, they want to predict the future price of wheat. And they have a list of factors containing data on rain, politicalTurbulence, and GDP.
+In order to see how these factors individually will impact wheat, they can run the following:
+
+~~~~
+FACTOR rain = input/rain.csv, 1, 2
+FACTOR turb = input/turb.csv, 1, 2
+FACTOR GDP = input/gdp.csv, 1, 2
+
+COMMODITY wheat = input/wheat.csv, 1, 2
+
+LIST myFactors = rain, turb, GDP
+
+wheat.regression(1/1/2005 - 1/1/2006, 2/1/2006, myFactors)
+
+###
+in this case, you have created 3 different prediction for the given date range.
+The first prediction relies on wheat prices and rain levels.
+The second prediction relies on wehat prices and political turbulence levels.
+The third predcition relies on wehat prices and GDP.
+###
+~~~~
+
+The second version of calling a '.futures()' function is useful if one wants to weight different factors to create one prediction.
+This can be done by assigning a numerical value to each factor with an '=' operator. See the example below:
+
+~~~~
+FACTOR rain = input/rain.csv, 1, 2
+FACTOR turb = input/turb.csv, 1, 2
+FACTOR GDP = input/gdp.csv, 1, 2
+
+COMMODITY wheat = input/wheat.csv, 1, 2
+
+wheat.regression(1/1/2005 - 1/1/2006, 2/1/2006, rain=3, turb=5, GDP=2)
+
+###
+in this case, you have create 1 different prediction for the given data range.
+It will run a regression, weighting the factors importance based on the numbers assigned with the '=' operator.
+###
+~~~~
+
+ANTLR Grammar
+--------------------------------
+Below, we've attatched our Expr.g4 file.
+Note, we will be using ANTLR in python, as certain python libraries are well suited for the mathematical calculations we will be conducting later on.
+
+Expr.g4
+~~~~
+grammar Expr;
+
+prog       : stat (NEWLINE stat)* EOF ;
+
+stat       : loadFile | makeList | addToList | removeFromList | normalize | futures | historicalComp;
+
+loadFile    : fileType STRING '=' filePath FILE ',' INT ',' INT
+            ;
+
+fileType    : COMMODITY
+            | INFLATION
+            | FACTOR
+            ;
+
+filePath    : STRING '/' filePath
+            | STRING '/'
+            ;
+
+makeList    : LIST type STRING
+            | LIST type STRING '=' listContent
+            ;
+
+listContent : STRING moreStrings
+            ;
+
+moreStrings : ',' STRING moreStrings
+            |
+            ;
+
+type        : COMMODITY
+            | INFLATION
+            | FACTOR
+            | PREDICTION
+            ;
+
+addToList   : STRING '.' ADD '(' STRING ')'
+            ;
+
+removeFromList  : STRING '.' REMOVE '(' STRING ')'
+                ;
+
+normalize   : STRING '.normalize(' STRING ')'
+            ;
+
+futures     : STRING '.' futuresFunction '(' DATE '-' DATE ',' DATE ',' futuresParams ')'
+            ;
+
+futuresFunction : REGRESSION
+                ;
+
+futuresParams   : futuresIterated
+                | futuresWeighted
+                ;
+
+futuresIterated : STRING moreStrings
+
+                ;
+
+futuresWeighted : STRING '=' STRING
+                | STRING '=' INT
+                | STRING '=' INT moreWeights
+                ;
+
+moreWeights     : ',' STRING '=' INT moreWeights
+                |
+                ;
+
+historicalComp : 'historicalComp' '(' STRING ')'
+               | 'historicalComp' '(' DATE ',' STRING ',' (FLOAT | INT)')'
+               ;
+
+
+FILE     : [a-z]+ '.csv' ;
+ADD      : 'ADD' ;
+REMOVE   : 'REMOVE' ;
+DATE     : INT '/' INT '/' INT ;
+
+LIST     : 'LIST' ;
+
+COMMODITY   : 'COMMODITY' ;
+INFLATION   : 'INFLATION' ;
+FACTOR      : 'FACTOR' ;
+PREDICTION  : 'PREDICTION' ;
+REGRESSION : 'REGRESSION' ;
+
+STRING   : [a-zA-Z] [a-zA-Z0-9]* ;
+INT      : [0-9]+ ;
+FLOAT    : [0-9] +  ( '.' [0-9]+)? ;
+NUM      : FLOAT | INT;
+
+NEWLINE : '\r'? '\n' ;
+WS      : [ \t]+ -> skip ;
+~~~~
+
+We've also attatched our tests.txt file, which contains several correct and incorrect ussages of the language.
+Note, we used the ANTLR4 Python3 Plug-In on Pycharm to do the testing.
+We plan to write the entire project using this plug in.
+
+We've attatched our testing file, and a few screenshots of the plug-in verifying our test cases.
+
+tests.txt
+~~~~
+COMMODITY corn = downloads/input/corn.csv, 1, 3
+LIST FACTOR myFactors
+LIST COMMODITY myCOMMODITIES = corn, wheat, oil, soybeans
+myFactors.ADD(rainfall)
+myCOMMODITIES.REMOVE(wheat)
+myCOMMODITIES.normalize(inflation2023)
+myCOMMODITIES.REGRESSION(1/1/2020-1/1/2021, 1/1/2023, myFactors)
+myCOMMODITIES.REGRESSION(1/1/2020-1/1/2021, 1/1/2023,myFactors=1)
+corn.REGRESSION(1/1/2020-1/1/2021, 1/1/2023,rainfall, polIndex, temperature)
+myCOMMODITIES.REGRESSION(1/1/2020-1/1/2021, 1/1/2023, rainfall=5, polIndex=10, temperature=20)
+historicalComp(1/1/2, corn, 4)
+
+COMMODITY corn = downloads/input/corn.csv
+LIST COMMODITY myCOMMODITIES = corn, wheat, oil,
+myFactors.ADD()
+myCOMMODITIES.REGRESSION(myFactors)
+myCOMMODITIES.REGRESSION(1/1/2020-1/1/2021, 1/1/2023,1)
+myCOMMODITIES.REGRESSION(1/1/2020-1/1/2021, myFactors)
+historicalComp(corn, 4, 1/1/2)
+~~~~
+
+We ran all the cases, but for the sake of brevity, only are showing a select few here.
+Note that the first three are correct, but the last one is not.
+
+![Test cases](testCases.png)
+
+Here was our parse tree generator by the ANTLR pluging.
+
+![Parse Tree Generator](parseTreeResult.png)
+
+
+
+Moving Forward
+--------------------------------
+We plan to use a similar approach to the Java 'errorHandler' and 'entireFile' programs to continue testing our language.
 
 
 
